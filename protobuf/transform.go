@@ -256,6 +256,12 @@ func (t *Transformer) transformField(pkg *Package, msg *Message, field *scanner.
 		Repeated: repeated,
 	}
 
+	// If this field has set pos in tag,
+	// use customize protobuf positin.
+	if field.Pos != 0 {
+		f.Pos = field.Pos
+	}
+
 	// []byte is the only repeated type that maps to
 	// a non-repeated type in protobuf, so we handle
 	// it a bit differently.

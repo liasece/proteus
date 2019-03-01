@@ -302,6 +302,7 @@ type Field struct {
 	Docs
 	Name string
 	Type Type
+	Pos  int
 }
 
 // Func is either a function or a method. Receiver will be nil in functions,

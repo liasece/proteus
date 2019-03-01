@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -294,6 +295,7 @@ func scanStruct(s *Struct, elem *types.Struct) *Struct {
 		f := &Field{
 			Name: v.Name(),
 			Type: scanType(v.Type()),
+			Pos:  getProtoID(v, tags),
 		}
 		if f.Type == nil {
 			continue
@@ -388,6 +390,17 @@ func (v enumValues) Less(i, j int) bool {
 
 func isIgnoredField(f *types.Var, tags []string) bool {
 	return !f.Exported() || (len(tags) > 0 && tags[0] == "-")
+}
+
+func getProtoID(f *types.Var, tags []string) int {
+	if len(tags) == 0 {
+		return 0
+	}
+	i, err := strconv.Atoi(tags[0])
+	if err != nil {
+		return 0
+	}
+	return i
 }
 
 func objectsInScope(scope *types.Scope) (objs []types.Object) {
