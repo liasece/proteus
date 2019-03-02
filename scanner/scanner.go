@@ -393,10 +393,10 @@ func isIgnoredField(f *types.Var, tags []string) bool {
 }
 
 func getProtoID(f *types.Var, tags []string) int {
-	if len(tags) == 0 {
+	if len(tags) < 2 {
 		return 0
 	}
-	i, err := strconv.Atoi(tags[0])
+	i, err := strconv.Atoi(tags[1])
 	if err != nil {
 		return 0
 	}
