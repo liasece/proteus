@@ -270,6 +270,7 @@ func (s *TransformerSuite) TestTransformField() {
 		name     string
 		typ      scanner.Type
 		expected *Field
+		pos      int
 	}{
 		{
 			"Foo",
@@ -279,6 +280,7 @@ func (s *TransformerSuite) TestTransformField() {
 				Type:    NewBasic("int64"),
 				Options: Options{"(gogoproto.casttype)": NewStringValue("int")},
 			},
+			0,
 		},
 		{
 			"Bar",
@@ -288,6 +290,7 @@ func (s *TransformerSuite) TestTransformField() {
 				Type:    NewBasic("bytes"),
 				Options: Options{},
 			},
+			0,
 		},
 		{
 			"BazBar",
@@ -298,6 +301,7 @@ func (s *TransformerSuite) TestTransformField() {
 				Repeated: true,
 				Options:  Options{"(gogoproto.casttype)": NewStringValue("int")},
 			},
+			0,
 		},
 		{
 			"CustomID",
@@ -310,6 +314,7 @@ func (s *TransformerSuite) TestTransformField() {
 					"(gogoproto.casttype)":   NewStringValue("int"),
 				},
 			},
+			0,
 		},
 		{
 			"NullableType",
@@ -319,6 +324,7 @@ func (s *TransformerSuite) TestTransformField() {
 				Type:    NewNamed("my.pckg", "hello"),
 				Options: Options{},
 			},
+			0,
 		},
 		{
 			"NonNullableType",
@@ -330,11 +336,13 @@ func (s *TransformerSuite) TestTransformField() {
 					"(gogoproto.nullable)": NewLiteralValue("false"),
 				},
 			},
+			0,
 		},
 		{
 			"Invalid",
 			scanner.NewBasic("complex64"),
 			nil,
+			0,
 		},
 		{
 			"MyEnum",
@@ -344,6 +352,7 @@ func (s *TransformerSuite) TestTransformField() {
 				Type:    NewNamed("my.pckg", "MyEnum"),
 				Options: Options{},
 			},
+			0,
 		},
 		{
 			"MyAlias",
@@ -361,6 +370,7 @@ func (s *TransformerSuite) TestTransformField() {
 					"(gogoproto.casttype)": NewStringValue("my/pckg.MyAlias"),
 				},
 			},
+			0,
 		},
 		{
 			"MyRepeatedAlias",
@@ -376,6 +386,18 @@ func (s *TransformerSuite) TestTransformField() {
 				),
 				Options: Options{},
 			},
+			0,
+		},
+		{
+			"ProtoID",
+			scanner.NewBasic("int64"),
+			&Field{
+				Name:    "proto_id",
+				Type:    NewBasic("int64"),
+				Options: Options{"(gogoproto.customname)": NewStringValue("ProtoID")},
+				Pos:     101,
+			},
+			101,
 		},
 	}
 
@@ -387,6 +409,7 @@ func (s *TransformerSuite) TestTransformField() {
 		f := s.t.transformField(&Package{}, &Message{}, &scanner.Field{
 			Name: c.name,
 			Type: c.typ,
+			Pos:  c.pos,
 		}, 0)
 		if c.expected == nil {
 			s.Nil(f, c.name)
@@ -394,6 +417,7 @@ func (s *TransformerSuite) TestTransformField() {
 			s.Equal(c.expected.Name, f.Name, fmt.Sprintf("Name in %s", c.name))
 			s.assertType(c.expected.Type, f.Type, c.name)
 			s.Equal(c.expected.Options, f.Options, fmt.Sprintf("Options in %s", c.name))
+			s.Equal(c.expected.Pos, f.Pos, fmt.Sprintf("Proto id in %d", c.pos))
 		}
 	}
 }

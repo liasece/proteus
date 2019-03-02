@@ -158,6 +158,36 @@ func TestScanStruct(t *testing.T) {
 			},
 		},
 		{
+			"struct with proto field id tag",
+			types.NewStruct(
+				[]*types.Var{
+					mkField("Foo", types.Typ[types.Int], false),
+				},
+				[]string{`proteus:",101"`},
+			),
+			&Struct{
+				Fields: []*Field{
+					{Name: "Foo", Type: NewBasic("int"), Pos: 101},
+				},
+			},
+		},
+		{
+			"invalid struct with proto field id tag",
+			types.NewStruct(
+				[]*types.Var{
+					mkField("Foo", types.Typ[types.Int], false),
+					mkField("Bar", types.Typ[types.Int], false),
+				},
+				[]string{`proteus:","`, `proteus:",lol"`},
+			),
+			&Struct{
+				Fields: []*Field{
+					{Name: "Foo", Type: NewBasic("int"), Pos: 0},
+					{Name: "Bar", Type: NewBasic("int"), Pos: 0},
+				},
+			},
+		},
+		{
 			"struct with unsupported type",
 			types.NewStruct(
 				[]*types.Var{

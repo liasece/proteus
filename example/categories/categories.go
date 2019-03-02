@@ -5,4 +5,9 @@ package categories
 type CategoryOptions struct {
 	ShowPrices bool
 	CanBuy     bool
+	// The next field was deleted.
+	// Field3 int
+
+	// 4th field, use `proteus:",4"` forward compatible
+	Field4 int `proteus:",4"`
 }
